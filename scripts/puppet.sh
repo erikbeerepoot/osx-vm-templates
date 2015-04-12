@@ -12,7 +12,7 @@ HIERA_VERSION=${HIERA_VERSION:-latest}
 
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
-function install_dmg() {
+install_dmg() {
     local name="$1"
     local dmg_path="$2"
 
@@ -32,15 +32,17 @@ function install_dmg() {
     hdiutil eject "${tmpmount}"
 }
 
-function get_dmg() {
+get_dmg() {
     local recipe_name="$1"
     local version="$2"
     local report_path=$(mktemp /tmp/autopkg-report-XXXX)
 
     # Run AutoPkg setting VERSION, and saving the results as a plist
-    "${AUTOPKG}" run --report-plist ${report_path} -k VERSION="${version}" ${recipe_name} > \
-        $(mktemp "/tmp/autopkg-runlog-${recipe_name}")
-    echo $(/usr/libexec/PlistBuddy -c 'Print :new_downloads:0' ${report_path})
+    "${AUTOPKG}" run --report-plist "${report_path}" -k VERSION="${version}" "${recipe_name}" > \
+        "$(mktemp "/tmp/autopkg-runlog-${recipe_name}")"
+    /usr/libexec/PlistBuddy -c \
+        'Print :summary_results:url_downloader_summary_result:data_rows:0:download_path' \
+        "${report_path}"
 }
 
 # Get AutoPkg
@@ -67,4 +69,4 @@ install_dmg "Hiera" "${HIERA_DMG}"
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "~/Library/AutoPkg"
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "${AUTOPKG_DIR}" "~/Library/AutoPkg"

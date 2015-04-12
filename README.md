@@ -2,7 +2,13 @@
 
 This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
 
-The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). You can override this, to build a machine with different admin account settings, and without the vagrant ssh keys.
+The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three providers:
+
+- The [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) (recommended)
+- Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
+- [Parallels](https://github.com/Parallels/vagrant-parallels)
+
+It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems such as CI.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
 
@@ -102,6 +108,13 @@ For some kinds of automated tasks, it may be necessary to have an active GUI log
 
 This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://magervalp.github.com/CreateUserPkg) utility, which was used to help create the box's vagrant user in the `prepare_iso` script, and which also supports generating the magic kcpassword file with a particular hash format to set up the auto-login.
 
+## System updates
+
+Packer will instruct the system to download and install all available OS X updates, if you want to disable this default behaviour, use `update_system` variable:
+
+```
+packer build -var update_system=0 template.json
+```
 
 ## VirtualBox support
 
